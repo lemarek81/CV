@@ -155,18 +155,38 @@
   .print-fab:hover { transform: translateY(-1px); }
   .print-fab svg { width: 14px; height: 14px; fill: currentColor; }
 
+  /* LANGUAGE TOGGLE */
+  .lang-toggle {
+    position: fixed; top: 24px; left: 24px; z-index: 50;
+    display: inline-flex; gap: 2px; padding: 3px;
+    background: #fff; border: 1px solid var(--rule); border-radius: 999px;
+    box-shadow: 0 6px 18px -6px rgba(20,30,60,0.18);
+  }
+  .lang-toggle button {
+    border: none; background: none; cursor: pointer;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    padding: 7px 15px; border-radius: 999px; color: var(--ink-3);
+    transition: background 120ms, color 120ms;
+  }
+  .lang-toggle button.active { background: var(--accent); color: #fff; }
+
   @page { size: A4; margin: 12mm 0 12mm 0; }
   @media print {
     html, body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .viewport { padding: 0; }
     .page { box-shadow: none; padding: 6mm 20mm 6mm 20mm; }
-    .print-fab { display: none !important; }
+    .print-fab, .lang-toggle { display: none !important; }
     .role-card, .edu-card, .bottom-grid > div { break-inside: avoid; }
   }
 </style>
 </head>
 <body>
 <div class="viewport">
+  <div class="lang-toggle" role="group" aria-label="CV language">
+    <button type="button" data-lang="pl" onclick="setCvLang('pl')">PL</button>
+    <button type="button" data-lang="de" onclick="setCvLang('de')">DE</button>
+  </div>
+
   <button class="print-fab" onclick="window.print()">
     <svg viewBox="0 0 24 24"><path d="M6 2h12v6H6V2zm-2 8h16a2 2 0 0 1 2 2v6h-4v4H6v-4H2v-6a2 2 0 0 1 2-2zm4 6v4h8v-4H8zm10-3a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
     Print / PDF
@@ -185,11 +205,10 @@
     </header>
 
     <div class="meta-strip">
-      <div class="meta-item"><span class="meta-label">Email</span><span class="meta-value"><a href="/cdn-cgi/l/email-protection#fb979e969a899e90bb8b9498818f9ad59d96"><span class="__cf_email__" data-cfemail="7a161f171b081f113a0a1519000e1b541c17">[email&#160;protected]</span></a></span></div>
-      <div class="meta-item"><span class="meta-label">Phone</span><span class="meta-value">+48 600 245 212</span></div>
+      <div class="meta-item"><span class="meta-label">Email</span><span class="meta-value"><a href="/cdn-cgi/l/email-protection#533f363e3221363813233c302927327d353e"><span class="__cf_email__" data-cfemail="81ede4ece0f3e4eac1f1eee2fbf5e0afe7ec">[email&#160;protected]</span></a></span></div>
+      <div class="meta-item"><span class="meta-label">Phone</span><span class="meta-value" id="meta-phone">+48 600 245 212</span></div>
       <div class="meta-item"><span class="meta-label">LinkedIn</span><span class="meta-value"><a href="https://www.linkedin.com/in/leszek-marek/">linkedin.com/in/leszek‑marek</a></span></div>
-      <div class="meta-item"><span class="meta-label">Based in</span><span class="meta-value">Wrocław, Poland</span></div>
-      <div class="meta-item"><span class="meta-label">Currently</span><span class="meta-value">Hanau, Germany</span></div>
+      <div class="meta-item"><span class="meta-label">Based in</span><span class="meta-value" id="meta-based">Wrocław, Poland</span></div>
     </div>
 
     <h2 class="sec-head">Experience</h2>
@@ -361,5 +380,26 @@
 
   </article>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  function setCvLang(lang) {
+    var data = {
+      pl: { phone: "+48 600 245 212", based: "Wrocław, Poland" },
+      de: { phone: "+49 151 558 28 408", based: "Hanau, Germany" }
+    }[lang] || null;
+    if (!data) { lang = "pl"; data = { phone: "+48 600 245 212", based: "Wrocław, Poland" }; }
+    document.getElementById("meta-phone").textContent = data.phone;
+    document.getElementById("meta-based").textContent = data.based;
+    var btns = document.querySelectorAll(".lang-toggle button");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle("active", btns[i].getAttribute("data-lang") === lang);
+    }
+    try { localStorage.setItem("cvLang", lang); } catch (e) {}
+  }
+  (function () {
+    var saved = "pl";
+    try { saved = localStorage.getItem("cvLang") || "pl"; } catch (e) {}
+    setCvLang(saved);
+  })();
+</script>
+</body>
 </html>
